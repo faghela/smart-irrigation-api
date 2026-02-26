@@ -2,35 +2,44 @@ from flask import Flask, request, jsonify
 import joblib
 import numpy as np
 import os
+from pymongo import MongoClient
+from datetime import datetime
 
 app = Flask(__name__)
 
-# تحديد المسار الصحيح للمودل
-model_path = os.path.join(os.path.dirname(__file__), 'irrigation_model.pkl')
+# إعداد الاتصال بقاعدة بيانات MongoDB
+# سيأخذ الرابط من متغيرات البيئة في Railway
+MONGO_URI = os.environ.get('MONGO_URI', 'mongodb://localhost:27017/')
+try:
+    client = MongoClient(MONGO_URI)
+    db = client['irrigation_db']          # اسم قاعدة البيانات
+    collection = db['sensor_data']        # اسم "المجموعة" (الجدول)
+    print("--- Connected to MongoDB successfully! ---")
+except Exception as e:
+    print(f"--- MongoDB Connection Error: {e} ---")
 
 # تحميل المودل
+model_path = os.path.join(os.path.dirname(__file__), 'irrigation_model.pkl')
 if os.path.exists(model_path):
     model = joblib.load(model_path)
     print("--- Model loaded successfully! ---")
 else:
     print(f"--- Error: {model_path} not found! ---")
 
-# الصفحة الرئيسية للتأكد من عمل السيرفر
 @app.route('/', methods=['GET'])
 def home():
     return """
     <h1>Smart Irrigation Server is Online!</h1>
-    <p>The AI model is ready. Send your data to <b>/predict</b> using a POST request.</p>
+    <p>The AI model and MongoDB connection are ready.</p>
     """
 
-# مسار التنبؤ (يستقبل البيانات ويرجع النتيجة)
 @app.route('/predict', methods=['POST'])
 def predict():
     try:
-        # استقبال البيانات من Node-RED أو أي مصدر آخر
+        # استقبال البيانات
         data = request.json
         
-        # التأكد من ترتيب المدخلات (يجب أن يكون بنفس ترتيب التدريب)
+        # التنبؤ
         features = np.array([[
             data['temperature'],
             data['humidity'],
@@ -38,21 +47,31 @@ def predict():
             data['light'],
             data['rainfall']
         ]])
+        prediction = int(model.predict(features)[0])
         
-        # التنبؤ
-        prediction = model.predict(features)[0]
+        # تجهيز السجل لحفظه في MongoDB
+        record = {
+            "temperature": data['temperature'],
+            "humidity": data['humidity'],
+            "soil_moisture": data['soil_moisture'],
+            "light": data['light'],
+            "rainfall": data['rainfall'],
+            "irrigation_required": prediction,
+            "timestamp": datetime.now() # حفظ وقت وتاريخ القراءة
+        }
         
-        # إرسال النتيجة
+        # إدخال البيانات في قاعدة البيانات
+        collection.insert_one(record)
+        
+        # إرسال النتيجة لـ Node-RED
         return jsonify({
-            'irrigation_required': int(prediction),
-            'status': 'success'
+            'irrigation_required': prediction,
+            'status': 'success',
+            'message': 'Data saved to MongoDB successfully!'
         })
     except Exception as e:
         return jsonify({'error': str(e), 'status': 'failed'})
 
-# تشغيل السيرفر
 if __name__ == '__main__':
-    # أخذ البورت من بيئة Railway، وإذا لم يجده (مثل التشغيل المحلي) يستخدم 5000
-    port = int(os.environ.get('PORT', 5000))
-    # إيقاف وضع التطوير (debug=False) لأنه السيرفر الآن في مرحلة الإنتاج (Production)
+    port = int(os.environ.get('PORT', 8080))
     app.run(host='0.0.0.0', port=port, debug=False)
