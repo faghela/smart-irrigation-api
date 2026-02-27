@@ -1,0 +1,969 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>لوحة التحكم | Smart Irrigation Dashboard</title>
+
+    <!-- Bootstrap 5 RTL -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.rtl.min.css"
+        crossorigin="anonymous" />
+
+    <!-- Google Fonts -->
+    <link
+        href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;900&family=Inter:wght@400;600;700&display=swap"
+        rel="stylesheet" />
+
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
+
+    <style>
+        /* ═══════════════════════════════════════════
+       CSS Variables / Design Tokens
+    ═══════════════════════════════════════════ */
+        :root {
+            --green-dark: #0a6b3b;
+            --green-mid: #16a35a;
+            --green-light: #28c76f;
+            --sidebar-bg: #0d1f12;
+            --body-bg: #0f2318;
+            --card-bg: #162b1c;
+            --card-border: #1e3d27;
+            --text-primary: #e8f5ec;
+            --text-muted: #7aad8a;
+            --danger: #e74c3c;
+            --warning: #f39c12;
+            --info: #3498db;
+        }
+
+        /* ═══════════════════════════════════════════
+       Base
+    ═══════════════════════════════════════════ */
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Tajawal', 'Inter', sans-serif;
+            background-color: var(--body-bg);
+            color: var(--text-primary);
+            min-height: 100vh;
+            margin: 0;
+        }
+
+        /* ═══════════════════════════════════════════
+       Navbar / Top Bar
+    ═══════════════════════════════════════════ */
+        .top-navbar {
+            background: var(--sidebar-bg);
+            border-bottom: 1px solid var(--card-border);
+            padding: 0.75rem 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 20px rgba(0, 0, 0, 0.4);
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .brand-icon {
+            width: 42px;
+            height: 42px;
+            background: linear-gradient(135deg, var(--green-light), var(--green-dark));
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.4rem;
+        }
+
+        .brand-text-ar {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #fff;
+            line-height: 1.1;
+        }
+
+        .brand-text-en {
+            font-size: 0.65rem;
+            color: var(--text-muted);
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        .nav-right {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .user-badge {
+            background: rgba(40, 199, 111, 0.12);
+            border: 1px solid rgba(40, 199, 111, 0.3);
+            color: var(--green-light);
+            padding: 0.3rem 0.9rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .btn-logout {
+            background: rgba(231, 76, 60, 0.15);
+            border: 1px solid rgba(231, 76, 60, 0.35);
+            color: #e74c3c;
+            padding: 0.35rem 0.9rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            text-decoration: none;
+            transition: background 0.2s;
+            font-family: inherit;
+        }
+
+        .btn-logout:hover {
+            background: rgba(231, 76, 60, 0.3);
+            color: #e74c3c;
+        }
+
+        /* Live indicator dot */
+        .live-dot {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            background: var(--green-light);
+            border-radius: 50%;
+            animation: pulse-dot 1.5s ease-in-out infinite;
+        }
+
+        @keyframes pulse-dot {
+
+            0%,
+            100% {
+                opacity: 1;
+                transform: scale(1);
+            }
+
+            50% {
+                opacity: 0.4;
+                transform: scale(0.7);
+            }
+        }
+
+        /* ═══════════════════════════════════════════
+       Main Layout
+    ═══════════════════════════════════════════ */
+        .main-content {
+            padding: 1.75rem 1.5rem;
+            max-width: 1280px;
+            margin: 0 auto;
+        }
+
+        .section-heading {
+            font-size: 0.72rem;
+            font-weight: 700;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            margin-bottom: 1rem;
+        }
+
+        /* ═══════════════════════════════════════════
+       Sensor Cards
+    ═══════════════════════════════════════════ */
+        .sensor-card {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 18px;
+            padding: 1.5rem;
+            position: relative;
+            overflow: hidden;
+            transition: transform 0.25s, box-shadow 0.25s;
+        }
+
+        .sensor-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.35);
+        }
+
+        .sensor-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 80px;
+            height: 80px;
+            border-radius: 0 18px 0 100%;
+            opacity: 0.15;
+        }
+
+        .sensor-card.soil::before {
+            background: var(--info);
+        }
+
+        .sensor-card.temp::before {
+            background: var(--warning);
+        }
+
+        .sensor-card.humid::before {
+            background: var(--green-light);
+        }
+
+        .sensor-icon {
+            font-size: 2rem;
+            display: block;
+            margin-bottom: 0.8rem;
+        }
+
+        .sensor-label-ar {
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: var(--text-muted);
+        }
+
+        .sensor-label-en {
+            font-size: 0.7rem;
+            color: rgba(122, 173, 138, 0.6);
+            letter-spacing: 0.5px;
+        }
+
+        .sensor-value {
+            font-size: 2.4rem;
+            font-weight: 900;
+            color: #fff;
+            line-height: 1;
+            margin: 0.5rem 0 0.3rem;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .sensor-unit {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            font-family: 'Inter', sans-serif;
+        }
+
+        /* Thin accent line at bottom of card */
+        .sensor-card.soil {
+            border-bottom: 3px solid var(--info);
+        }
+
+        .sensor-card.temp {
+            border-bottom: 3px solid var(--warning);
+        }
+
+        .sensor-card.humid {
+            border-bottom: 3px solid var(--green-light);
+        }
+
+        /* ═══════════════════════════════════════════
+       Pump Status Card
+    ═══════════════════════════════════════════ */
+        .pump-card {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 18px;
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+        }
+
+        .pump-label-ar {
+            font-size: 0.9rem;
+            font-weight: 700;
+            color: var(--text-muted);
+        }
+
+        .pump-label-en {
+            font-size: 0.7rem;
+            color: rgba(122, 173, 138, 0.6);
+        }
+
+        .pump-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.55rem 1.4rem;
+            border-radius: 30px;
+            font-size: 1.15rem;
+            font-weight: 700;
+            margin: 1rem 0 0.3rem;
+            transition: all 0.4s ease;
+        }
+
+        .pump-badge.on {
+            background: rgba(40, 199, 111, 0.2);
+            border: 2px solid var(--green-light);
+            color: var(--green-light);
+            box-shadow: 0 0 18px rgba(40, 199, 111, 0.35);
+        }
+
+        .pump-badge.off {
+            background: rgba(231, 76, 60, 0.15);
+            border: 2px solid #e74c3c;
+            color: #e74c3c;
+        }
+
+        .last-update {
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            margin-top: 0.5rem;
+        }
+
+        /* ═══════════════════════════════════════════
+       Chart Card
+    ═══════════════════════════════════════════ */
+        .chart-card {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 18px;
+            padding: 1.5rem;
+        }
+
+        .chart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        .chart-title-ar {
+            font-size: 1rem;
+            font-weight: 700;
+            color: #fff;
+        }
+
+        .chart-title-en {
+            font-size: 0.72rem;
+            color: var(--text-muted);
+        }
+
+        .chart-legend {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            font-size: 0.75rem;
+        }
+
+        .legend-dot {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            margin-left: 4px;
+        }
+
+        /* ═══════════════════════════════════════════
+       Manual Control Panel
+    ═══════════════════════════════════════════ */
+        .control-card {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 18px;
+            padding: 1.75rem;
+        }
+
+        .control-title-ar {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #fff;
+        }
+
+        .control-title-en {
+            font-size: 0.72rem;
+            color: var(--text-muted);
+            letter-spacing: 0.5px;
+            margin-bottom: 1.5rem;
+        }
+
+        /* Override Toggle */
+        .override-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid var(--card-border);
+            border-radius: 14px;
+            padding: 1rem 1.2rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .override-label-ar {
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: #fff;
+        }
+
+        .override-label-en {
+            font-size: 0.72rem;
+            color: var(--text-muted);
+        }
+
+        /* Bootstrap switch restyled */
+        .form-check-input:checked {
+            background-color: var(--green-light) !important;
+            border-color: var(--green-light) !important;
+        }
+
+        .form-switch .form-check-input {
+            width: 3em;
+            height: 1.5em;
+            cursor: pointer;
+        }
+
+        /* Control Buttons */
+        .btn-force-start {
+            width: 100%;
+            background: linear-gradient(135deg, #28c76f, #0a6b3b);
+            border: none;
+            border-radius: 12px;
+            color: #fff;
+            font-size: 1rem;
+            font-weight: 700;
+            font-family: inherit;
+            padding: 0.85rem;
+            cursor: pointer;
+            transition: all 0.25s;
+            box-shadow: 0 6px 20px rgba(40, 199, 111, 0.35);
+            margin-bottom: 0.75rem;
+        }
+
+        .btn-force-start:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 28px rgba(40, 199, 111, 0.5);
+        }
+
+        .btn-emergency {
+            width: 100%;
+            background: linear-gradient(135deg, #e74c3c, #922b21);
+            border: none;
+            border-radius: 12px;
+            color: #fff;
+            font-size: 1rem;
+            font-weight: 700;
+            font-family: inherit;
+            padding: 0.85rem;
+            cursor: pointer;
+            transition: all 0.25s;
+            box-shadow: 0 6px 20px rgba(231, 76, 60, 0.35);
+        }
+
+        .btn-emergency:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 28px rgba(231, 76, 60, 0.5);
+        }
+
+        button:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+            transform: none !important;
+            box-shadow: none !important;
+        }
+
+        /* Action feedback bar */
+        #actionFeedback {
+            border-radius: 10px;
+            padding: 0.65rem 1rem;
+            font-size: 0.85rem;
+            text-align: center;
+            margin-top: 1rem;
+            display: none;
+            font-weight: 600;
+        }
+
+        /* ═══════════════════════════════════════════
+       Refresh‑time footer bar
+    ═══════════════════════════════════════════ */
+        .footer-bar {
+            text-align: center;
+            padding: 1.5rem;
+            color: var(--text-muted);
+            font-size: 0.75rem;
+            border-top: 1px solid var(--card-border);
+            margin-top: 2rem;
+        }
+
+        /* ═══════════════════════════════════════════
+       Skeleton / Loading states
+    ═══════════════════════════════════════════ */
+        .skeleton {
+            background: linear-gradient(90deg, #1e3d27 25%, #26542f 50%, #1e3d27 75%);
+            background-size: 200% 100%;
+            animation: skeleton-shimmer 1.2s infinite;
+            border-radius: 8px;
+            display: inline-block;
+        }
+
+        @keyframes skeleton-shimmer {
+            0% {
+                background-position: 200% 0;
+            }
+
+            100% {
+                background-position: -200% 0;
+            }
+        }
+
+        /* ═══════════════════════════════════════════
+       Responsive tweaks
+    ═══════════════════════════════════════════ */
+        @media (max-width: 576px) {
+            .top-navbar {
+                flex-wrap: wrap;
+                gap: 0.5rem;
+            }
+
+            .sensor-value {
+                font-size: 1.9rem;
+            }
+
+            .main-content {
+                padding: 1rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- ─────────────────────────────────────────
+       TOP NAVBAR
+  ───────────────────────────────────────────── -->
+    <nav class="top-navbar">
+        <div class="brand">
+            <div class="brand-icon">🌱</div>
+            <div>
+                <div class="brand-text-ar">نظام الري الذكي</div>
+                <div class="brand-text-en">Smart Irrigation System</div>
+            </div>
+        </div>
+
+        <div class="nav-right">
+            <!-- Live indicator -->
+            <span style="font-size:0.8rem; color:var(--text-muted);">
+                <span class="live-dot"></span>
+                <span id="liveLabel" style="margin-right:4px;">مباشر | LIVE</span>
+            </span>
+
+            <!-- Logged-in user -->
+            <span class="user-badge">
+                <i class="bi bi-person-fill"></i>
+                {{ user_id }}
+            </span>
+
+            <!-- Logout -->
+            <a href="{{ url_for('logout') }}" class="btn-logout">
+                <i class="bi bi-box-arrow-right"></i>
+                خروج | Logout
+            </a>
+        </div>
+    </nav>
+
+    <!-- ─────────────────────────────────────────
+       MAIN CONTENT
+  ───────────────────────────────────────────── -->
+    <div class="main-content">
+
+        <!-- ── Section: Sensor Cards ── -->
+        <p class="section-heading">⚡ مؤشرات الاستشعار الحية | Live Sensor Readings</p>
+
+        <div class="row g-3 mb-4">
+
+            <!-- Card 1: Soil Moisture Resistance -->
+            <div class="col-12 col-sm-6 col-lg-3">
+                <div class="sensor-card soil h-100">
+                    <span class="sensor-icon">🔌</span>
+                    <div class="sensor-label-ar">مقاومة رطوبة التربة</div>
+                    <div class="sensor-label-en">Soil Moisture Resistance</div>
+                    <div class="sensor-value" id="soilValue">
+                        <span class="skeleton" style="width:80px;height:2.4rem;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+                    </div>
+                    <div class="sensor-unit">Ω (Ohm)</div>
+                </div>
+            </div>
+
+            <!-- Card 2: Temperature -->
+            <div class="col-12 col-sm-6 col-lg-3">
+                <div class="sensor-card temp h-100">
+                    <span class="sensor-icon">🌡️</span>
+                    <div class="sensor-label-ar">درجة الحرارة</div>
+                    <div class="sensor-label-en">Air Temperature</div>
+                    <div class="sensor-value" id="tempValue">
+                        <span class="skeleton" style="width:70px;height:2.4rem;">&nbsp;&nbsp;&nbsp;&nbsp;</span>
+                    </div>
+                    <div class="sensor-unit">°C</div>
+                </div>
+            </div>
+
+            <!-- Card 3: Humidity -->
+            <div class="col-12 col-sm-6 col-lg-3">
+                <div class="sensor-card humid h-100">
+                    <span class="sensor-icon">💧</span>
+                    <div class="sensor-label-ar">رطوبة الجو</div>
+                    <div class="sensor-label-en">Air Humidity</div>
+                    <div class="sensor-value" id="humidValue">
+                        <span class="skeleton" style="width:70px;height:2.4rem;">&nbsp;&nbsp;&nbsp;&nbsp;</span>
+                    </div>
+                    <div class="sensor-unit">%</div>
+                </div>
+            </div>
+
+            <!-- Card 4: Pump Status -->
+            <div class="col-12 col-sm-6 col-lg-3">
+                <div class="pump-card h-100">
+                    <div class="pump-label-ar">حالة المضخة</div>
+                    <div class="pump-label-en">Water Pump Status</div>
+                    <div class="pump-badge off" id="pumpBadge">
+                        <i class="bi bi-power"></i>
+                        <span id="pumpText">جاري التحميل...</span>
+                    </div>
+                    <div class="last-update" id="lastUpdate">—</div>
+                </div>
+            </div>
+
+        </div><!-- /row sensor cards -->
+
+        <!-- ── Section: Chart + Control Panel side-by-side on large screens ── -->
+        <div class="row g-3 mb-4">
+
+            <!-- History Chart -->
+            <div class="col-12 col-xl-8">
+                <div class="chart-card h-100">
+                    <div class="chart-header">
+                        <div>
+                            <div class="chart-title-ar">📈 سجل بيانات المستشعرات</div>
+                            <div class="chart-title-en">Sensor Data History (Last 50 Readings)</div>
+                        </div>
+                        <div class="chart-legend">
+                            <span><span class="legend-dot" style="background:#3498db;"></span>مقاومة التربة |
+                                Soil</span>
+                            <span><span class="legend-dot" style="background:#f39c12;"></span>الحرارة | Temp</span>
+                            <span><span class="legend-dot" style="background:#28c76f;"></span>الرطوبة | Humidity</span>
+                        </div>
+                    </div>
+                    <canvas id="sensorChart" height="120"></canvas>
+                </div>
+            </div>
+
+            <!-- Manual Control Panel -->
+            <div class="col-12 col-xl-4">
+                <div class="control-card h-100">
+
+                    <div class="control-title-ar">🕹️ لوحة التحكم اليدوي</div>
+                    <div class="control-title-en">Manual Control Panel</div>
+
+                    <!-- Manual Override Toggle -->
+                    <div class="override-row">
+                        <div>
+                            <div class="override-label-ar">تجاوز يدوي</div>
+                            <div class="override-label-en">Manual Override</div>
+                        </div>
+                        <div class="form-check form-switch mb-0">
+                            <input class="form-check-input" type="checkbox" role="switch" id="overrideToggle"
+                                onchange="toggleOverride(this)" />
+                        </div>
+                    </div>
+
+                    <!-- Force Start Button -->
+                    <button id="btnForceStart" class="btn-force-start" onclick="pumpControl('start')" disabled>
+                        <i class="bi bi-play-fill"></i>
+                        &nbsp;تشغيل قسري | Force Start
+                    </button>
+
+                    <!-- Emergency Stop Button -->
+                    <button id="btnEmergencyStop" class="btn-emergency" onclick="pumpControl('stop')" disabled>
+                        <i class="bi bi-stop-fill"></i>
+                        &nbsp;إيقاف طارئ | Emergency Stop
+                    </button>
+
+                    <!-- Action Feedback -->
+                    <div id="actionFeedback"></div>
+
+                </div><!-- /control-card -->
+            </div>
+
+        </div><!-- /row chart+control -->
+
+    </div><!-- /main-content -->
+
+    <!-- Footer -->
+    <div class="footer-bar">
+        🌱 نظام الري الذكي | Smart Irrigation System &nbsp;·&nbsp;
+        يتم التحديث كل 5 ثوانٍ | Auto-refresh every 5 seconds &nbsp;·&nbsp;
+        <span id="footerClock"></span>
+    </div>
+
+    <!-- ─────────────────────────────────────────
+       SCRIPTS
+  ───────────────────────────────────────────── -->
+    <!-- Bootstrap 5 JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+        crossorigin="anonymous"></script>
+
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
+
+    <script>
+        /* ─────────────────────────────────────────
+           Chart Setup
+        ─────────────────────────────────────────── */
+        const ctx = document.getElementById('sensorChart').getContext('2d');
+        const sensorChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: [],
+                datasets: [
+                    {
+                        label: 'مقاومة التربة (Ω)',
+                        data: [],
+                        borderColor: '#3498db',
+                        backgroundColor: 'rgba(52,152,219,0.08)',
+                        borderWidth: 2,
+                        tension: 0.4,
+                        fill: true,
+                        pointRadius: 3,
+                        pointHoverRadius: 6,
+                    },
+                    {
+                        label: 'الحرارة (°C)',
+                        data: [],
+                        borderColor: '#f39c12',
+                        backgroundColor: 'rgba(243,156,18,0.08)',
+                        borderWidth: 2,
+                        tension: 0.4,
+                        fill: true,
+                        pointRadius: 3,
+                        pointHoverRadius: 6,
+                    },
+                    {
+                        label: 'الرطوبة (%)',
+                        data: [],
+                        borderColor: '#28c76f',
+                        backgroundColor: 'rgba(40,199,111,0.08)',
+                        borderWidth: 2,
+                        tension: 0.4,
+                        fill: true,
+                        pointRadius: 3,
+                        pointHoverRadius: 6,
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                interaction: { mode: 'index', intersect: false },
+                plugins: {
+                    legend: {
+                        display: false   // We use a custom legend above
+                    },
+                    tooltip: {
+                        backgroundColor: '#0d1f12',
+                        borderColor: '#1e3d27',
+                        borderWidth: 1,
+                        titleColor: '#28c76f',
+                        bodyColor: '#e8f5ec',
+                    }
+                },
+                scales: {
+                    x: {
+                        ticks: { color: '#7aad8a', font: { size: 10 }, maxTicksLimit: 8 },
+                        grid: { color: 'rgba(255,255,255,0.05)' }
+                    },
+                    y: {
+                        ticks: { color: '#7aad8a', font: { size: 10 } },
+                        grid: { color: 'rgba(255,255,255,0.05)' }
+                    }
+                }
+            }
+        });
+
+        /* ─────────────────────────────────────────
+           Fetch Latest Sensor Data (cards)
+        ─────────────────────────────────────────── */
+        async function fetchLatest() {
+            try {
+                const res = await fetch('/api/latest');
+                const data = await res.json();
+
+                if (data.status === 'success') {
+                    // Update sensor value cards
+                    setCardValue('soilValue', data.soil_resistance, 1);
+                    setCardValue('tempValue', data.temperature, 1);
+                    setCardValue('humidValue', data.humidity, 1);
+
+                    // Pump status badge
+                    const badge = document.getElementById('pumpBadge');
+                    const pumpText = document.getElementById('pumpText');
+                    if (data.pump_status === 1) {
+                        badge.className = 'pump-badge on';
+                        pumpText.textContent = '💦 تشغيل | ON';
+                    } else {
+                        badge.className = 'pump-badge off';
+                        pumpText.textContent = '🚫 إيقاف | OFF';
+                    }
+
+                    // Last update timestamp
+                    if (data.timestamp) {
+                        const dt = new Date(data.timestamp);
+                        document.getElementById('lastUpdate').textContent =
+                            'آخر تحديث: ' + dt.toLocaleTimeString('ar-SA');
+                    }
+                } else if (data.status === 'no_data') {
+                    setCardValue('soilValue', '—', 0);
+                    setCardValue('tempValue', '—', 0);
+                    setCardValue('humidValue', '—', 0);
+                }
+            } catch (e) {
+                console.warn('fetchLatest error:', e);
+            }
+        }
+
+        function setCardValue(elemId, val, decimals) {
+            const el = document.getElementById(elemId);
+            if (typeof val === 'number') {
+                el.textContent = val.toFixed(decimals);
+            } else {
+                el.textContent = val;
+            }
+        }
+
+        /* ─────────────────────────────────────────
+           Fetch History for Chart
+        ─────────────────────────────────────────── */
+        async function fetchHistory() {
+            try {
+                const res = await fetch('/api/history');
+                const data = await res.json();
+
+                if (data.status === 'success' && data.data.length > 0) {
+                    const records = data.data;
+
+                    // Build labels: short time string
+                    const labels = records.map(r => {
+                        if (!r.timestamp) return '—';
+                        const d = new Date(r.timestamp);
+                        return d.toLocaleTimeString('ar-SA', { hour: '2-digit', minute: '2-digit' });
+                    });
+
+                    sensorChart.data.labels = labels;
+                    sensorChart.data.datasets[0].data = records.map(r => r.soil_resistance ?? null);
+                    sensorChart.data.datasets[1].data = records.map(r => r.temperature ?? null);
+                    sensorChart.data.datasets[2].data = records.map(r => r.humidity ?? null);
+                    sensorChart.update('none'); // 'none' = no animation on refresh (smoother)
+                }
+            } catch (e) {
+                console.warn('fetchHistory error:', e);
+            }
+        }
+
+        /* ─────────────────────────────────────────
+           Manual Override Toggle
+        ─────────────────────────────────────────── */
+        function toggleOverride(checkbox) {
+            const isOn = checkbox.checked;
+            document.getElementById('btnForceStart').disabled = !isOn;
+            document.getElementById('btnEmergencyStop').disabled = !isOn;
+
+            // Show / hide feedback
+            const fb = document.getElementById('actionFeedback');
+            if (isOn) {
+                fb.style.display = 'block';
+                fb.style.background = 'rgba(243,156,18,0.15)';
+                fb.style.color = '#f39c12';
+                fb.style.border = '1px solid rgba(243,156,18,0.3)';
+                fb.textContent = '⚠️ وضع التحكم اليدوي مُفعَّل | Manual override is ACTIVE';
+            } else {
+                fb.style.display = 'none';
+            }
+        }
+
+        /* ─────────────────────────────────────────
+           Pump Control API
+        ─────────────────────────────────────────── */
+        async function pumpControl(action) {
+            const fb = document.getElementById('actionFeedback');
+            const btnStart = document.getElementById('btnForceStart');
+            const btnStop = document.getElementById('btnEmergencyStop');
+
+            // Disable both buttons while request is in-flight
+            btnStart.disabled = true;
+            btnStop.disabled = true;
+            fb.style.display = 'block';
+            fb.style.background = 'rgba(255,255,255,0.05)';
+            fb.style.color = '#7aad8a';
+            fb.style.border = '1px solid #1e3d27';
+            fb.textContent = '⏳ جاري إرسال الأمر... | Sending command...';
+
+            try {
+                const res = await fetch('/api/pump/control', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ action })
+                });
+                const data = await res.json();
+
+                if (data.status === 'ok') {
+                    if (action === 'start') {
+                        fb.style.background = 'rgba(40,199,111,0.15)';
+                        fb.style.color = '#28c76f';
+                        fb.style.border = '1px solid rgba(40,199,111,0.4)';
+                        fb.textContent = '✅ تم تشغيل المضخة قسرياً | Pump Force Started!';
+                    } else {
+                        fb.style.background = 'rgba(231,76,60,0.15)';
+                        fb.style.color = '#e74c3c';
+                        fb.style.border = '1px solid rgba(231,76,60,0.4)';
+                        fb.textContent = '🛑 إيقاف طارئ تم تنفيذه | Emergency Stop Executed!';
+                    }
+                    // Immediately refresh latest data to reflect change
+                    fetchLatest();
+                } else {
+                    fb.style.color = '#e74c3c';
+                    fb.textContent = '❌ خطأ: ' + (data.message || 'Unknown error');
+                }
+            } catch (e) {
+                fb.style.color = '#e74c3c';
+                fb.textContent = '❌ فشل الاتصال | Connection failed';
+            } finally {
+                // Re-enable buttons if override is still on
+                if (document.getElementById('overrideToggle').checked) {
+                    btnStart.disabled = false;
+                    btnStop.disabled = false;
+                }
+            }
+        }
+
+        /* ─────────────────────────────────────────
+           Footer Clock
+        ─────────────────────────────────────────── */
+        function updateClock() {
+            document.getElementById('footerClock').textContent =
+                new Date().toLocaleString('ar-SA');
+        }
+
+        /* ─────────────────────────────────────────
+           Init & Auto-Refresh every 5 seconds
+        ─────────────────────────────────────────── */
+        fetchLatest();
+        fetchHistory();
+        updateClock();
+
+        setInterval(fetchLatest, 5000);   // cards refresh every 5s
+        setInterval(fetchHistory, 30000);  // chart refresh every 30s
+        setInterval(updateClock, 1000);   // clock every 1s
+    </script>
+
+</body>
+
+</html>

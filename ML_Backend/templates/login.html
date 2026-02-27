@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>تسجيل الدخول | Smart Irrigation Login</title>
+
+  <!-- Bootstrap 5 RTL -->
+  <link rel="stylesheet"
+    href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.rtl.min.css"
+    integrity="sha384-dpuaG1suU0eT09tx5plTaGMLBsfDLX5UkJrEr0Y8V1JcDPvEKrRFr5OM1GtDe4X"
+    crossorigin="anonymous" />
+
+  <!-- Google Fonts: Tajawal (Arabic) + Inter (Latin) -->
+  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700&family=Inter:wght@400;600&display=swap"
+        rel="stylesheet" />
+
+  <style>
+    /* ── Root Variables ── */
+    :root {
+      --green-dark  : #0a6b3b;
+      --green-mid   : #16a35a;
+      --green-light : #28c76f;
+      --glass-bg    : rgba(255, 255, 255, 0.12);
+      --glass-border: rgba(255, 255, 255, 0.25);
+    }
+
+    /* ── Body / Background ── */
+    body {
+      font-family: 'Tajawal', 'Inter', sans-serif;
+      min-height: 100vh;
+      margin: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(135deg, #0a6b3b 0%, #16a35a 50%, #064e2e 100%);
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* Animated floating circles in background */
+    body::before, body::after {
+      content: '';
+      position: absolute;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.07);
+      animation: float 8s ease-in-out infinite;
+    }
+    body::before { width: 380px; height: 380px; top: -100px; left: -120px; }
+    body::after  { width: 260px; height: 260px; bottom: -80px; right: -80px; animation-delay: 3s; }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0); }
+      50%       { transform: translateY(-20px); }
+    }
+
+    /* ── Glassmorphism Card ── */
+    .login-card {
+      width: 100%;
+      max-width: 420px;
+      background: var(--glass-bg);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      border: 1px solid var(--glass-border);
+      border-radius: 24px;
+      padding: 2.5rem 2rem;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.35);
+      position: relative;
+      z-index: 1;
+    }
+
+    /* ── Logo / Icon ── */
+    .login-icon {
+      width: 72px; height: 72px;
+      background: linear-gradient(135deg, var(--green-light), var(--green-dark));
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 2rem;
+      margin: 0 auto 1.2rem;
+      box-shadow: 0 8px 20px rgba(40, 199, 111, 0.4);
+    }
+
+    /* ── Title ── */
+    .login-title-ar { font-size: 1.5rem; font-weight: 700; color: #fff; text-align: center; }
+    .login-title-en { font-size: 0.85rem; color: rgba(255,255,255,0.65); text-align: center; letter-spacing: 1px; margin-bottom: 1.8rem; }
+
+    /* ── Labels ── */
+    .field-label-ar  { font-size: 0.95rem; font-weight: 700; color: #fff; display: block; margin-bottom: 2px; }
+    .field-label-en  { font-size: 0.72rem; color: rgba(255,255,255,0.55); letter-spacing: 0.5px; }
+
+    /* ── Inputs ── */
+    .form-control-custom {
+      width: 100%;
+      background: rgba(255,255,255,0.15);
+      border: 1px solid rgba(255,255,255,0.3);
+      border-radius: 12px;
+      color: #fff;
+      padding: 0.75rem 1rem;
+      font-size: 1rem;
+      font-family: inherit;
+      transition: border 0.25s, box-shadow 0.25s;
+      margin-top: 0.4rem;
+    }
+    .form-control-custom::placeholder { color: rgba(255,255,255,0.4); }
+    .form-control-custom:focus {
+      outline: none;
+      border-color: var(--green-light);
+      box-shadow: 0 0 0 3px rgba(40,199,111,0.3);
+      background: rgba(255,255,255,0.2);
+    }
+
+    /* ── Submit Button ── */
+    .btn-login {
+      width: 100%;
+      padding: 0.85rem;
+      background: linear-gradient(135deg, var(--green-light), var(--green-mid));
+      border: none;
+      border-radius: 12px;
+      color: #fff;
+      font-size: 1.05rem;
+      font-weight: 700;
+      font-family: inherit;
+      cursor: pointer;
+      transition: transform 0.2s, box-shadow 0.2s;
+      margin-top: 0.5rem;
+      box-shadow: 0 6px 20px rgba(40,199,111,0.45);
+    }
+    .btn-login:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 28px rgba(40,199,111,0.55);
+    }
+    .btn-login:active { transform: translateY(0); }
+
+    /* ── Flash Alerts ── */
+    .alert-flash {
+      border-radius: 12px;
+      font-size: 0.9rem;
+      text-align: center;
+      margin-bottom: 1rem;
+    }
+
+    /* ── Divider ── */
+    .field-group { margin-bottom: 1.2rem; }
+
+    /* ── Footer hint ── */
+    .login-hint {
+      text-align: center;
+      color: rgba(255,255,255,0.45);
+      font-size: 0.75rem;
+      margin-top: 1.4rem;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="login-card">
+
+    <!-- Icon -->
+    <div class="login-icon">🌱</div>
+
+    <!-- Title -->
+    <p class="login-title-ar">نظام الري الذكي</p>
+    <p class="login-title-en">SMART IRRIGATION SYSTEM</p>
+
+    <!-- Flash Messages (from Flask) -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+          <div class="alert alert-{{ 'danger' if category == 'danger' else 'success' if category == 'success' else 'warning' }} alert-flash" role="alert">
+            {{ message }}
+          </div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+
+    <!-- Login Form -->
+    <form method="POST" action="{{ url_for('login') }}" autocomplete="off">
+
+      <!-- User ID -->
+      <div class="field-group">
+        <label>
+          <span class="field-label-ar">🪪 معرف المستخدم</span>
+          <span class="field-label-en">User ID</span>
+        </label>
+        <input
+          type="text"
+          name="user_id"
+          class="form-control-custom"
+          placeholder="أدخل معرف المستخدم / Enter User ID"
+          required
+          autofocus />
+      </div>
+
+      <!-- Access Token (Password) -->
+      <div class="field-group">
+        <label>
+          <span class="field-label-ar">🔑 رمز الوصول (كلمة المرور)</span>
+          <span class="field-label-en">Access Token (Password)</span>
+        </label>
+        <input
+          type="password"
+          name="access_token"
+          class="form-control-custom"
+          placeholder="أدخل رمز الوصول / Enter Access Token"
+          required />
+      </div>
+
+      <!-- Submit -->
+      <button type="submit" class="btn-login">
+        🚀 دخول | Login
+      </button>
+    </form>
+
+    <!-- Hint -->
+    <p class="login-hint">
+      🔒 الجلسة محمية بتشفير آمن | Session is securely encrypted
+    </p>
+
+  </div><!-- /login-card -->
+
+  <!-- Bootstrap 5 JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+    integrity="sha384-YvpcrYf0tY3lHB60NNkmXc4s9bIOgUxi8T/jzmaBq/YGVw/m6qalSBYPMHxuGeh"
+    crossorigin="anonymous"></script>
+</body>
+</html>
