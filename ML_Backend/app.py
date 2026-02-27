@@ -26,7 +26,7 @@ else:
     print(f"--- Error: {model_path} not found! ---")
 
 # ==========================================
-# واجهة المستخدم التفاعلية (HTML & CSS & JS)
+# واجهة المستخدم التفاعلية المحسنة
 # ==========================================
 HTML_PAGE = """
 <!DOCTYPE html>
@@ -34,58 +34,59 @@ HTML_PAGE = """
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Smart Irrigation Tester</title>
+    <title>Smart Irrigation Dashboard</title>
     <style>
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f0f8ff; margin: 0; padding: 40px; display: flex; justify-content: center; }
-        .card { background: white; padding: 30px; border-radius: 12px; box-shadow: 0 8px 16px rgba(0,0,0,0.1); width: 100%; max-width: 400px; }
-        h2 { text-align: center; color: #0056b3; margin-bottom: 20px; }
-        label { font-weight: bold; color: #333; margin-top: 15px; display: block; font-size: 14px; }
-        input { width: 100%; padding: 10px; margin-top: 5px; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box; font-size: 16px; }
-        button { width: 100%; padding: 12px; margin-top: 25px; background-color: #28a745; color: white; border: none; border-radius: 6px; font-size: 16px; font-weight: bold; cursor: pointer; transition: 0.3s; }
-        button:hover { background-color: #218838; }
-        #result { margin-top: 20px; padding: 15px; text-align: center; font-size: 18px; font-weight: bold; border-radius: 6px; display: none; }
-        .yes { background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
-        .no { background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
-        .db-msg { font-size: 12px; font-weight: normal; margin-top: 5px; display: block; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #e9ecef; margin: 0; padding: 40px; display: flex; justify-content: center; }
+        .card { background: white; padding: 30px; border-radius: 12px; box-shadow: 0 10px 20px rgba(0,0,0,0.1); width: 100%; max-width: 450px; }
+        h2 { text-align: center; color: #2c3e50; margin-bottom: 25px; border-bottom: 2px solid #3498db; padding-bottom: 10px; }
+        .input-group { margin-bottom: 15px; background: #f8f9fa; padding: 15px; border-radius: 8px; border-left: 4px solid #3498db; }
+        label { font-weight: bold; color: #34495e; display: block; font-size: 14px; margin-bottom: 5px;}
+        input { width: 100%; padding: 10px; border: 1px solid #ced4da; border-radius: 6px; box-sizing: border-box; font-size: 16px; }
+        button { width: 100%; padding: 14px; margin-top: 20px; background-color: #27ae60; color: white; border: none; border-radius: 6px; font-size: 16px; font-weight: bold; cursor: pointer; transition: 0.3s; }
+        button:hover { background-color: #219150; }
+        #result { margin-top: 25px; padding: 20px; text-align: center; font-size: 20px; font-weight: bold; border-radius: 8px; display: none; box-shadow: inset 0 0 10px rgba(0,0,0,0.05);}
+        .yes { background-color: #d4edda; color: #155724; border: 2px solid #c3e6cb; }
+        .no { background-color: #f8d7da; color: #721c24; border: 2px solid #f5c6cb; }
+        .db-msg { font-size: 13px; font-weight: normal; margin-top: 8px; display: block; color: #6c757d;}
+        .note { text-align: center; font-size: 12px; color: #7f8c8d; margin-top: 15px; }
     </style>
 </head>
 <body>
     <div class="card">
-        <h2>💧 Smart Irrigation Tester</h2>
+        <h2>🌱 Smart Irrigation API Test</h2>
         <form id="predictForm">
-            <label>🌡️ Temperature (°C):</label>
-            <input type="number" step="any" id="temp" required value="28.5">
+            <div class="input-group">
+                <label>🔌 Soil Moisture Resistance (Ohm):</label>
+                <input type="number" step="any" id="soil_res" required placeholder="e.g., 300">
+            </div>
             
-            <label>💧 Humidity (%):</label>
-            <input type="number" step="any" id="hum" required value="45.0">
+            <div class="input-group">
+                <label>🌡️ Ambient Temperature (°C):</label>
+                <input type="number" step="any" id="temp" required placeholder="e.g., 25.5">
+            </div>
             
-            <label>🌱 Soil Moisture (%):</label>
-            <input type="number" step="any" id="soil" required value="30.0">
+            <div class="input-group">
+                <label>💧 Atmospheric Humidity (%):</label>
+                <input type="number" step="any" id="hum" required placeholder="e.g., 60">
+            </div>
             
-            <label>☀️ Light (Lux):</label>
-            <input type="number" step="any" id="light" required value="800">
-            
-            <label>🌧️ Rainfall (mm):</label>
-            <input type="number" step="any" id="rain" required value="0">
-            
-            <button type="submit">Test Prediction & Save to DB</button>
+            <button type="submit">Run AI Prediction & Save</button>
         </form>
         <div id="result"></div>
+        <div class="note">* This is an API testing interface. Full dashboard & manual control will be in Node-RED.</div>
     </div>
 
     <script>
         document.getElementById('predictForm').addEventListener('submit', async function(e) {
             e.preventDefault();
             const btn = document.querySelector('button');
-            btn.innerHTML = 'Processing...';
+            btn.innerHTML = '⚙️ Processing...';
             btn.disabled = true;
 
             const data = {
+                soil_resistance: parseFloat(document.getElementById('soil_res').value),
                 temperature: parseFloat(document.getElementById('temp').value),
-                humidity: parseFloat(document.getElementById('hum').value),
-                soil_moisture: parseFloat(document.getElementById('soil').value),
-                light: parseFloat(document.getElementById('light').value),
-                rainfall: parseFloat(document.getElementById('rain').value)
+                humidity: parseFloat(document.getElementById('hum').value)
             };
 
             const resDiv = document.getElementById('result');
@@ -103,11 +104,11 @@ HTML_PAGE = """
                 const result = await response.json();
                 
                 if(result.status === 'success') {
-                    if(result.irrigation_required === 1) {
-                        resDiv.innerHTML = '💦 Irrigation: ON (1)<span class="db-msg">✔️ Saved to MongoDB</span>';
+                    if(result.pump_status === 1) {
+                        resDiv.innerHTML = '💦 Pump Status: ON (1)<span class="db-msg">✔️ Logged to MongoDB</span>';
                         resDiv.className = 'yes';
                     } else {
-                        resDiv.innerHTML = '🚫 Irrigation: OFF (0)<span class="db-msg">✔️ Saved to MongoDB</span>';
+                        resDiv.innerHTML = '🚫 Pump Status: OFF (0)<span class="db-msg">✔️ Logged to MongoDB</span>';
                         resDiv.className = 'no';
                     }
                 } else {
@@ -118,7 +119,7 @@ HTML_PAGE = """
                 resDiv.innerHTML = 'Network Error!';
                 resDiv.className = 'no';
             }
-            btn.innerHTML = 'Test Prediction & Save to DB';
+            btn.innerHTML = 'Run AI Prediction & Save';
             btn.disabled = false;
         });
     </script>
@@ -126,40 +127,34 @@ HTML_PAGE = """
 </html>
 """
 
-# مسار الصفحة الرئيسية (يعرض الواجهة التفاعلية)
 @app.route('/', methods=['GET'])
 def home():
     return render_template_string(HTML_PAGE)
 
-# مسار التنبؤ (يستقبل البيانات من الواجهة أو من Node-RED)
 @app.route('/predict', methods=['POST'])
 def predict():
     try:
         data = request.json
+        # الترتيب مهم جداً: يجب أن يطابق ترتيب الأعمدة في ملف التدريب
         features = np.array([[
+            data['soil_resistance'],
             data['temperature'],
-            data['humidity'],
-            data['soil_moisture'],
-            data['light'],
-            data['rainfall']
+            data['humidity']
         ]])
         
         prediction = int(model.predict(features)[0])
         
-        # حفظ البيانات في MongoDB
         record = {
+            "soil_resistance": data['soil_resistance'],
             "temperature": data['temperature'],
             "humidity": data['humidity'],
-            "soil_moisture": data['soil_moisture'],
-            "light": data['light'],
-            "rainfall": data['rainfall'],
-            "irrigation_required": prediction,
+            "pump_status": prediction,
             "timestamp": datetime.now()
         }
         collection.insert_one(record)
         
         return jsonify({
-            'irrigation_required': prediction,
+            'pump_status': prediction,
             'status': 'success',
             'message': 'Data saved successfully'
         })
