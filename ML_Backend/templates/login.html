@@ -1,226 +1,511 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
+
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>تسجيل الدخول | Smart Irrigation Login</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>نظام الري الذكي 2026 | Smart Irrigation Login</title>
 
-  <!-- Bootstrap 5 RTL -->
-  <link rel="stylesheet"
-    href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.rtl.min.css"
-    integrity="sha384-dpuaG1suU0eT09tx5plTaGMLBsfDLX5UkJrEr0Y8V1JcDPvEKrRFr5OM1GtDe4X"
-    crossorigin="anonymous" />
-
-  <!-- Google Fonts: Tajawal (Arabic) + Inter (Latin) -->
-  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700&family=Inter:wght@400;600&display=swap"
+    <!-- Google Fonts: Cairo (Arabic) + Orbitron (Futuristic Latin) + Inter -->
+    <link
+        href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;800;900&family=Orbitron:wght@500;700;900&family=Inter:wght@400;600&display=swap"
         rel="stylesheet" />
 
-  <style>
-    /* ── Root Variables ── */
-    :root {
-      --green-dark  : #0a6b3b;
-      --green-mid   : #16a35a;
-      --green-light : #28c76f;
-      --glass-bg    : rgba(255, 255, 255, 0.12);
-      --glass-border: rgba(255, 255, 255, 0.25);
-    }
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
 
-    /* ── Body / Background ── */
-    body {
-      font-family: 'Tajawal', 'Inter', sans-serif;
-      min-height: 100vh;
-      margin: 0;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: linear-gradient(135deg, #0a6b3b 0%, #16a35a 50%, #064e2e 100%);
-      position: relative;
-      overflow: hidden;
-    }
+    <style>
+        /* ════════════════════════════════════════════════════
+       2026 FUTURISTIC NEON THEME (Cyber-Agri Aesthetic)
+    ════════════════════════════════════════════════════ */
+        :root {
+            /* Deep Void Backgrounds */
+            --bg-darkest: #040806;
+            --bg-card: rgba(10, 20, 15, 0.65);
 
-    /* Animated floating circles in background */
-    body::before, body::after {
-      content: '';
-      position: absolute;
-      border-radius: 50%;
-      background: rgba(255,255,255,0.07);
-      animation: float 8s ease-in-out infinite;
-    }
-    body::before { width: 380px; height: 380px; top: -100px; left: -120px; }
-    body::after  { width: 260px; height: 260px; bottom: -80px; right: -80px; animation-delay: 3s; }
+            /* Glowing Neon Accents (Cyber Green / Tech Blue) */
+            --neon-green: #00ff88;
+            --neon-green-glow: rgba(0, 255, 136, 0.4);
+            --neon-blue: #00f0ff;
+            --neon-blue-glow: rgba(0, 240, 255, 0.3);
 
-    @keyframes float {
-      0%, 100% { transform: translateY(0); }
-      50%       { transform: translateY(-20px); }
-    }
+            /* Grid / Lines */
+            --grid-color: rgba(0, 255, 136, 0.05);
+            --border-thin: rgba(0, 255, 136, 0.2);
 
-    /* ── Glassmorphism Card ── */
-    .login-card {
-      width: 100%;
-      max-width: 420px;
-      background: var(--glass-bg);
-      backdrop-filter: blur(18px);
-      -webkit-backdrop-filter: blur(18px);
-      border: 1px solid var(--glass-border);
-      border-radius: 24px;
-      padding: 2.5rem 2rem;
-      box-shadow: 0 20px 60px rgba(0,0,0,0.35);
-      position: relative;
-      z-index: 1;
-    }
+            /* Typography */
+            --text-main: #e0fff0;
+            --text-muted: #6b9e84;
+        }
 
-    /* ── Logo / Icon ── */
-    .login-icon {
-      width: 72px; height: 72px;
-      background: linear-gradient(135deg, var(--green-light), var(--green-dark));
-      border-radius: 50%;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 2rem;
-      margin: 0 auto 1.2rem;
-      box-shadow: 0 8px 20px rgba(40, 199, 111, 0.4);
-    }
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
 
-    /* ── Title ── */
-    .login-title-ar { font-size: 1.5rem; font-weight: 700; color: #fff; text-align: center; }
-    .login-title-en { font-size: 0.85rem; color: rgba(255,255,255,0.65); text-align: center; letter-spacing: 1px; margin-bottom: 1.8rem; }
+        body {
+            background-color: var(--bg-darkest);
+            font-family: 'Cairo', 'Inter', sans-serif;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            color: var(--text-main);
+            position: relative;
+        }
 
-    /* ── Labels ── */
-    .field-label-ar  { font-size: 0.95rem; font-weight: 700; color: #fff; display: block; margin-bottom: 2px; }
-    .field-label-en  { font-size: 0.72rem; color: rgba(255,255,255,0.55); letter-spacing: 0.5px; }
+        /* ── Animated Tech Grid Background ── */
+        body::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background-image:
+                linear-gradient(var(--grid-color) 1px, transparent 1px),
+                linear-gradient(90deg, var(--grid-color) 1px, transparent 1px);
+            background-size: 40px 40px;
+            transform: perspective(600px) rotateX(60deg) translateY(-100px) translateZ(-200px);
+            animation: gridMove 15s linear infinite;
+            z-index: 0;
+            pointer-events: none;
+        }
 
-    /* ── Inputs ── */
-    .form-control-custom {
-      width: 100%;
-      background: rgba(255,255,255,0.15);
-      border: 1px solid rgba(255,255,255,0.3);
-      border-radius: 12px;
-      color: #fff;
-      padding: 0.75rem 1rem;
-      font-size: 1rem;
-      font-family: inherit;
-      transition: border 0.25s, box-shadow 0.25s;
-      margin-top: 0.4rem;
-    }
-    .form-control-custom::placeholder { color: rgba(255,255,255,0.4); }
-    .form-control-custom:focus {
-      outline: none;
-      border-color: var(--green-light);
-      box-shadow: 0 0 0 3px rgba(40,199,111,0.3);
-      background: rgba(255,255,255,0.2);
-    }
+        @keyframes gridMove {
+            0% {
+                transform: perspective(600px) rotateX(60deg) translateY(0) translateZ(-200px);
+            }
 
-    /* ── Submit Button ── */
-    .btn-login {
-      width: 100%;
-      padding: 0.85rem;
-      background: linear-gradient(135deg, var(--green-light), var(--green-mid));
-      border: none;
-      border-radius: 12px;
-      color: #fff;
-      font-size: 1.05rem;
-      font-weight: 700;
-      font-family: inherit;
-      cursor: pointer;
-      transition: transform 0.2s, box-shadow 0.2s;
-      margin-top: 0.5rem;
-      box-shadow: 0 6px 20px rgba(40,199,111,0.45);
-    }
-    .btn-login:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 10px 28px rgba(40,199,111,0.55);
-    }
-    .btn-login:active { transform: translateY(0); }
+            100% {
+                transform: perspective(600px) rotateX(60deg) translateY(40px) translateZ(-200px);
+            }
+        }
 
-    /* ── Flash Alerts ── */
-    .alert-flash {
-      border-radius: 12px;
-      font-size: 0.9rem;
-      text-align: center;
-      margin-bottom: 1rem;
-    }
+        /* ── Glowing Orbs ── */
+        .glow-orb {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(80px);
+            z-index: 0;
+            animation: orbFloat 10s ease-in-out infinite alternate;
+        }
 
-    /* ── Divider ── */
-    .field-group { margin-bottom: 1.2rem; }
+        .orb-1 {
+            width: 300px;
+            height: 300px;
+            background: var(--neon-green-glow);
+            top: -100px;
+            left: 10%;
+        }
 
-    /* ── Footer hint ── */
-    .login-hint {
-      text-align: center;
-      color: rgba(255,255,255,0.45);
-      font-size: 0.75rem;
-      margin-top: 1.4rem;
-    }
-  </style>
+        .orb-2 {
+            width: 400px;
+            height: 400px;
+            background: var(--neon-blue-glow);
+            bottom: -150px;
+            right: -50px;
+            animation-delay: -5s;
+        }
+
+        @keyframes orbFloat {
+            0% {
+                transform: translate(0, 0) scale(1);
+            }
+
+            100% {
+                transform: translate(50px, -50px) scale(1.1);
+            }
+        }
+
+        /* ── Main Login Panel (Glass & Neon) ── */
+        .login-container {
+            position: relative;
+            z-index: 10;
+            width: 100%;
+            max-width: 440px;
+            padding: 3rem 2.5rem;
+            background: var(--bg-card);
+            backdrop-filter: blur(25px);
+            -webkit-backdrop-filter: blur(25px);
+            border: 1px solid var(--border-thin);
+            border-radius: 24px;
+            box-shadow:
+                0 0 40px rgba(0, 0, 0, 0.8),
+                inset 0 0 20px rgba(0, 255, 136, 0.05);
+            animation: panelEntrance 1.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+            opacity: 0;
+            transform: translateY(40px) scale(0.95);
+        }
+
+        @keyframes panelEntrance {
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        /* Top Corner Tech Accents */
+        .login-container::before,
+        .login-container::after {
+            content: '';
+            position: absolute;
+            width: 30px;
+            height: 30px;
+            border: 2px solid var(--neon-green);
+            opacity: 0.5;
+        }
+
+        .login-container::before {
+            top: 0;
+            left: 0;
+            border-right: none;
+            border-bottom: none;
+            border-radius: 24px 0 0 0;
+        }
+
+        .login-container::after {
+            bottom: 0;
+            right: 0;
+            border-left: none;
+            border-top: none;
+            border-radius: 0 0 24px 0;
+        }
+
+        /* ── Logo & Title ── */
+        .logo-wrapper {
+            text-align: center;
+            margin-bottom: 2rem;
+            position: relative;
+        }
+
+        .logo-icon {
+            font-size: 3.5rem;
+            line-height: 1;
+            background: -webkit-linear-gradient(-45deg, var(--neon-green), var(--neon-blue));
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            filter: drop-shadow(0 0 10px var(--neon-green-glow));
+            margin-bottom: 0.5rem;
+            display: inline-block;
+            animation: pulseIcon 3s infinite;
+        }
+
+        @keyframes pulseIcon {
+
+            0%,
+            100% {
+                filter: drop-shadow(0 0 10px var(--neon-green-glow));
+            }
+
+            50% {
+                filter: drop-shadow(0 0 25px var(--neon-green));
+            }
+        }
+
+        .title-ar {
+            font-size: 2rem;
+            font-weight: 900;
+            color: #fff;
+            letter-spacing: -0.5px;
+            margin-bottom: 0.2rem;
+            text-shadow: 0 0 15px rgba(255, 255, 255, 0.2);
+        }
+
+        .title-en {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.8rem;
+            color: var(--neon-blue);
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            font-weight: 700;
+            opacity: 0.8;
+        }
+
+        /* ── Form Inputs ── */
+        .input-group {
+            position: relative;
+            margin-bottom: 1.8rem;
+        }
+
+        .input-icon {
+            position: absolute;
+            right: 18px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--neon-green);
+            font-size: 1.2rem;
+            opacity: 0.7;
+            transition: opacity 0.3s;
+        }
+
+        .cyber-input {
+            width: 100%;
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid var(--border-thin);
+            padding: 1rem 3rem 1rem 1.2rem;
+            /* padding right for icon in RTL */
+            border-radius: 14px;
+            color: #fff;
+            font-family: 'Inter', sans-serif;
+            font-size: 1.05rem;
+            outline: none;
+            transition: all 0.3s ease;
+            box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.5);
+        }
+
+        .cyber-input::placeholder {
+            color: var(--text-muted);
+            font-family: 'Cairo', sans-serif;
+            font-size: 0.95rem;
+        }
+
+        /* Hover & Focus Effects */
+        .cyber-input:hover {
+            border-color: rgba(0, 255, 136, 0.4);
+        }
+
+        .cyber-input:focus {
+            border-color: var(--neon-green);
+            background: rgba(0, 255, 136, 0.03);
+            box-shadow:
+                0 0 15px var(--neon-green-glow),
+                inset 0 0 10px rgba(0, 0, 0, 0.8);
+        }
+
+        .cyber-input:focus+.input-icon {
+            opacity: 1;
+            filter: drop-shadow(0 0 5px var(--neon-green));
+        }
+
+        /* Labels */
+        .input-label {
+            display: block;
+            font-size: 0.9rem;
+            font-weight: 700;
+            color: var(--text-main);
+            margin-bottom: 0.5rem;
+            opacity: 0.9;
+        }
+
+        .input-label span {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.65rem;
+            color: var(--text-muted);
+            letter-spacing: 1px;
+            margin-right: 8px;
+            /* RTL spacing */
+        }
+
+        /* ── Submit Button ── */
+        .cyber-btn {
+            width: 100%;
+            background: transparent;
+            border: 2px solid var(--neon-green);
+            color: var(--neon-green);
+            padding: 1rem;
+            border-radius: 14px;
+            font-size: 1.2rem;
+            font-family: 'Cairo', sans-serif;
+            font-weight: 800;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            margin-top: 1rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .cyber-btn i {
+            font-size: 1.3rem;
+        }
+
+        /* Button Hover Glitch/Fill Effect */
+        .cyber-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: var(--neon-green);
+            transition: all 0.4s cubic-bezier(0.19, 1, 0.22, 1);
+            z-index: -1;
+        }
+
+        .cyber-btn:hover {
+            color: #000;
+            box-shadow: 0 0 30px var(--neon-green-glow);
+        }
+
+        .cyber-btn:hover::before {
+            left: 0;
+        }
+
+        /* ── Flash Messages ── */
+        .alert {
+            padding: 1rem;
+            border-radius: 12px;
+            margin-bottom: 1.5rem;
+            font-size: 0.95rem;
+            font-weight: 600;
+            text-align: center;
+            background: rgba(255, 60, 60, 0.1);
+            border: 1px solid rgba(255, 60, 60, 0.3);
+            color: #ff4d4d;
+            box-shadow: 0 0 15px rgba(255, 60, 60, 0.2);
+            animation: alertShake 0.5s ease;
+        }
+
+        @keyframes alertShake {
+
+            0%,
+            100% {
+                transform: translateX(0);
+            }
+
+            20%,
+            60% {
+                transform: translateX(-5px);
+            }
+
+            40%,
+            80% {
+                transform: translateX(5px);
+            }
+        }
+
+        /* ── Footer ── */
+        .login-footer {
+            text-align: center;
+            margin-top: 2rem;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            font-family: 'Inter', sans-serif;
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .login-footer .system-status {
+            color: var(--neon-blue);
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.65rem;
+            letter-spacing: 2px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .status-dot {
+            width: 6px;
+            height: 6px;
+            background: var(--neon-blue);
+            border-radius: 50%;
+            animation: blink 2s infinite;
+            box-shadow: 0 0 8px var(--neon-blue);
+        }
+
+        @keyframes blink {
+
+            0%,
+            100% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0.3;
+            }
+        }
+
+        /* Responsive */
+        @media (max-width: 480px) {
+            .login-container {
+                border-radius: 0;
+                min-height: 100vh;
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+            }
+        }
+    </style>
 </head>
 
 <body>
-  <div class="login-card">
 
-    <!-- Icon -->
-    <div class="login-icon">🌱</div>
+    <!-- Background Orbs -->
+    <div class="glow-orb orb-1"></div>
+    <div class="glow-orb orb-2"></div>
 
-    <!-- Title -->
-    <p class="login-title-ar">نظام الري الذكي</p>
-    <p class="login-title-en">SMART IRRIGATION SYSTEM</p>
+    <!-- Login Card -->
+    <div class="login-container">
 
-    <!-- Flash Messages (from Flask) -->
-    {% with messages = get_flashed_messages(with_categories=true) %}
-      {% if messages %}
+        <div class="logo-wrapper">
+            <i class="bi bi-cpu logo-icon"></i>
+            <h1 class="title-ar">نظام الري الذكي</h1>
+            <div class="title-en">A.I. Smart Irrigation Core</div>
+        </div>
+
+        <!-- Flash Messages -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
         {% for category, message in messages %}
-          <div class="alert alert-{{ 'danger' if category == 'danger' else 'success' if category == 'success' else 'warning' }} alert-flash" role="alert">
-            {{ message }}
-          </div>
+        <!-- Only shows danger/warning manually, styling is mostly red for errors here -->
+        <div class="alert">
+            <i class="bi bi-exclamation-triangle-fill"></i> {{ message }}
+        </div>
         {% endfor %}
-      {% endif %}
-    {% endwith %}
+        {% endif %}
+        {% endwith %}
 
-    <!-- Login Form -->
-    <form method="POST" action="{{ url_for('login') }}" autocomplete="off">
+        <form method="POST" action="{{ url_for('login') }}" autocomplete="off">
 
-      <!-- User ID -->
-      <div class="field-group">
-        <label>
-          <span class="field-label-ar">🪪 معرف المستخدم</span>
-          <span class="field-label-en">User ID</span>
-        </label>
-        <input
-          type="text"
-          name="user_id"
-          class="form-control-custom"
-          placeholder="أدخل معرف المستخدم / Enter User ID"
-          required
-          autofocus />
-      </div>
+            <!-- User ID -->
+            <label class="input-label" for="user_id">
+                معرف المسؤول <span>SYS.ADMIN.ID</span>
+            </label>
+            <div class="input-group">
+                <input type="text" id="user_id" name="user_id" class="cyber-input" placeholder="أدخل كود الهوية..."
+                    required autofocus />
+                <i class="bi bi-person-bounding-box input-icon"></i>
+            </div>
 
-      <!-- Access Token (Password) -->
-      <div class="field-group">
-        <label>
-          <span class="field-label-ar">🔑 رمز الوصول (كلمة المرور)</span>
-          <span class="field-label-en">Access Token (Password)</span>
-        </label>
-        <input
-          type="password"
-          name="access_token"
-          class="form-control-custom"
-          placeholder="أدخل رمز الوصول / Enter Access Token"
-          required />
-      </div>
+            <!-- Password -->
+            <label class="input-label" for="access_token">
+                مفتاح التشفير <span>SECURE.TOKEN</span>
+            </label>
+            <div class="input-group">
+                <input type="password" id="access_token" name="access_token" class="cyber-input"
+                    placeholder="أدخل الرمز السري..." required />
+                <i class="bi bi-shield-lock input-icon"></i>
+            </div>
 
-      <!-- Submit -->
-      <button type="submit" class="btn-login">
-        🚀 دخول | Login
-      </button>
-    </form>
+            <!-- Submit -->
+            <button type="submit" class="cyber-btn">
+                تسجيل الدخول <i class="bi bi-fingerprint"></i>
+            </button>
 
-    <!-- Hint -->
-    <p class="login-hint">
-      🔒 الجلسة محمية بتشفير آمن | Session is securely encrypted
-    </p>
+        </form>
 
-  </div><!-- /login-card -->
+        <!-- Footer -->
+        <div class="login-footer">
+            <div>Ver 2.0.26 (Neural Edition)</div>
+            <div class="system-status">
+                <div class="status-dot"></div> SECURE KERNEL ACTIVE
+            </div>
+        </div>
 
-  <!-- Bootstrap 5 JS -->
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
-    integrity="sha384-YvpcrYf0tY3lHB60NNkmXc4s9bIOgUxi8T/jzmaBq/YGVw/m6qalSBYPMHxuGeh"
-    crossorigin="anonymous"></script>
+    </div>
+
 </body>
+
 </html>

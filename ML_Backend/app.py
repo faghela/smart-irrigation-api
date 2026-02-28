@@ -19,6 +19,7 @@ import os
 from pymongo import MongoClient, DESCENDING
 from datetime import datetime
 from functools import wraps
+import requests
 
 # ─────────────────────────────────────────────
 # App Configuration
@@ -29,8 +30,12 @@ app = Flask(__name__)
 app.secret_key = os.environ.get('SECRET_KEY', 'dev-secret-key-change-in-production')
 
 # Dashboard credentials (read from env vars; safe defaults for local dev)
-DASHBOARD_USER_ID = os.environ.get('DASHBOARD_USER_ID', 'admin')
-DASHBOARD_TOKEN   = os.environ.get('DASHBOARD_TOKEN',   'admin123')
+DASHBOARD_USER_ID = os.environ.get('USER_ID', 'mohamed_f')
+DASHBOARD_TOKEN   = os.environ.get('USER_TOKEN',   '123456')
+
+# OpenWeatherMap API settings
+WEATHER_API_KEY = os.environ.get('WEATHER_API_KEY', '2f33589846c0be576378ba18eab4cbb5')
+CITY = os.environ.get('CITY', 'Tripoli')
 
 # ─────────────────────────────────────────────
 # 1. MongoDB Connection
@@ -141,6 +146,50 @@ def api_latest():
             'humidity':        doc.get('humidity', 0),
             'pump_status':     doc.get('pump_status', 0),
             'timestamp':       doc['timestamp'].isoformat() if 'timestamp' in doc else None
+        })
+    except Exception as e:
+        return jsonify({'status': 'error', 'message': str(e)}), 500
+
+
+@app.route('/api/weather', methods=['GET'])
+@login_required
+def api_weather():
+    """Fetch real-time weather from OpenWeatherMap API."""
+    try:
+        url = f"https://api.openweathermap.org/data/2.5/weather?q={CITY}&appid={WEATHER_API_KEY}&units=metric&lang=ar"
+        response = requests.get(url, timeout=5)
+        response.raise_for_status()
+        data = response.json()
+        
+        # OpenWeatherMap returns temperature in main.temp
+        temp = data.get('main', {}).get('temp', 0)
+        humidity = data.get('main', {}).get('humidity', 0)
+        
+        # Weather description
+        weather_list = data.get('weather', [])
+        desc_ar = weather_list[0].get('description', '') if weather_list else 'غير متوفر'
+        
+        # Simplified English description mapping
+        icon_code = weather_list[0].get('icon', '') if weather_list else ''
+        desc_en = weather_list[0].get('main', '') if weather_list else 'Unknown'
+        
+        # Icon mapping based on OpenWeatherMap icon code
+        icon = "🌤️"
+        if icon_code.startswith('01'): icon = "☀️" # clear sky
+        elif icon_code.startswith('02'): icon = "⛅" # few clouds
+        elif icon_code.startswith('03') or icon_code.startswith('04'): icon = "☁️" # scattered/broken clouds
+        elif icon_code.startswith('09') or icon_code.startswith('10'): icon = "🌧️" # shower/rain
+        elif icon_code.startswith('11'): icon = "⛈️" # thunderstorm
+        elif icon_code.startswith('13'): icon = "❄️" # snow
+        elif icon_code.startswith('50'): icon = "🌫️" # mist
+        
+        return jsonify({
+            'status': 'success',
+            'temperature': temp,
+            'humidity': humidity,
+            'description_ar': desc_ar,
+            'description_en': desc_en,
+            'icon': icon
         })
     except Exception as e:
         return jsonify({'status': 'error', 'message': str(e)}), 500
