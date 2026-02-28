@@ -758,9 +758,25 @@
                     document.getElementById('wTemp').textContent = data.temperature.toFixed(1) + '°C';
                     document.getElementById('wHumid').textContent = data.humidity.toFixed(1) + '%';
                     document.getElementById('wDescAr').textContent = data.description_ar;
-                    document.getElementById('wDescEn').textContent = data.description_en;
+                    // Show source as sub-label
+                    document.getElementById('wDescEn').textContent =
+                        data.description_en + (data.source === 'Open-Meteo (fallback)' ? ' ٪ (Open-Meteo)' : '');
+                } else {
+                    // API returned an error status
+                    document.getElementById('wIcon').textContent = '⚠️';
+                    document.getElementById('wTemp').textContent = '--°C';
+                    document.getElementById('wHumid').textContent = '--%';
+                    document.getElementById('wDescAr').textContent = 'خطأ في جلب الطقس';
+                    document.getElementById('wDescEn').textContent = data.message || 'Weather API Error';
                 }
-            } catch (e) { console.warn('Fetch Weather Error:', e); }
+            } catch (e) {
+                // Network or javascript error
+                document.getElementById('wIcon').textContent = '📡';
+                document.getElementById('wTemp').textContent = '—';
+                document.getElementById('wHumid').textContent = '—';
+                document.getElementById('wDescAr').textContent = 'لا يوجد اتصال بالخادم';
+                document.getElementById('wDescEn').textContent = 'Connection error';
+            }
         }
 
         // ──────── Manual Control ────────

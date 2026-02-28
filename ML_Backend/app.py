@@ -154,45 +154,80 @@ def api_latest():
 @app.route('/api/weather', methods=['GET'])
 @login_required
 def api_weather():
-    """Fetch real-time weather from OpenWeatherMap API."""
+    """
+    Fetch real-time weather.
+    Tries OpenWeatherMap first.
+    Falls back to the free Open-Meteo API if OWM fails
+    (e.g. key not yet activated, quota exceeded, network error).
+    """
+    def icon_from_owm_code(icon_code):
+        if icon_code.startswith('01'): return '☀️'
+        if icon_code.startswith('02'): return '⛅'
+        if icon_code.startswith('03') or icon_code.startswith('04'): return '☁️'
+        if icon_code.startswith('09') or icon_code.startswith('10'): return '🌧️'
+        if icon_code.startswith('11'): return '⛈️'
+        if icon_code.startswith('13'): return '❄️'
+        if icon_code.startswith('50'): return '🌫️'
+        return '🌤️'
+
+    # ── 1. Try OpenWeatherMap ──────────────────────────────────
     try:
-        url = f"https://api.openweathermap.org/data/2.5/weather?q={CITY}&appid={WEATHER_API_KEY}&units=metric&lang=ar"
-        response = requests.get(url, timeout=5)
-        response.raise_for_status()
-        data = response.json()
-        
-        # OpenWeatherMap returns temperature in main.temp
-        temp = data.get('main', {}).get('temp', 0)
-        humidity = data.get('main', {}).get('humidity', 0)
-        
-        # Weather description
-        weather_list = data.get('weather', [])
-        desc_ar = weather_list[0].get('description', '') if weather_list else 'غير متوفر'
-        
-        # Simplified English description mapping
-        icon_code = weather_list[0].get('icon', '') if weather_list else ''
-        desc_en = weather_list[0].get('main', '') if weather_list else 'Unknown'
-        
-        # Icon mapping based on OpenWeatherMap icon code
-        icon = "🌤️"
-        if icon_code.startswith('01'): icon = "☀️" # clear sky
-        elif icon_code.startswith('02'): icon = "⛅" # few clouds
-        elif icon_code.startswith('03') or icon_code.startswith('04'): icon = "☁️" # scattered/broken clouds
-        elif icon_code.startswith('09') or icon_code.startswith('10'): icon = "🌧️" # shower/rain
-        elif icon_code.startswith('11'): icon = "⛈️" # thunderstorm
-        elif icon_code.startswith('13'): icon = "❄️" # snow
-        elif icon_code.startswith('50'): icon = "🌫️" # mist
-        
+        url = (
+            f"https://api.openweathermap.org/data/2.5/weather"
+            f"?q={CITY}&appid={WEATHER_API_KEY}&units=metric&lang=ar"
+        )
+        r = requests.get(url, timeout=5)
+
+        # OWM returns 401 for invalid/inactive key, 404 for unknown city
+        if r.status_code == 200:
+            data      = r.json()
+            temp      = data.get('main', {}).get('temp', 0)
+            humidity  = data.get('main', {}).get('humidity', 0)
+            w_list    = data.get('weather', [{}])
+            desc_ar   = w_list[0].get('description', 'غير متوفر')
+            desc_en   = w_list[0].get('main', 'Unknown')
+            icon      = icon_from_owm_code(w_list[0].get('icon', ''))
+            return jsonify({
+                'status': 'success', 'source': 'OpenWeatherMap',
+                'temperature': temp, 'humidity': humidity,
+                'description_ar': desc_ar, 'description_en': desc_en, 'icon': icon
+            })
+        else:
+            owm_error = r.json().get('message', f'HTTP {r.status_code}')
+            print(f"⚠️  OWM failed ({owm_error}), switching to Open-Meteo fallback…")
+    except Exception as owm_exc:
+        print(f"⚠️  OWM exception ({owm_exc}), switching to Open-Meteo fallback…")
+
+    # ── 2. Fallback → Open-Meteo (always free, no key needed) ──
+    # Coordinates for Tripoli, Libya (32.90°N, 13.18°E)
+    try:
+        lat, lon = '32.9028', '13.1805'
+        url = (
+            f"https://api.open-meteo.com/v1/forecast"
+            f"?latitude={lat}&longitude={lon}"
+            f"&current=temperature_2m,relative_humidity_2m,weather_code&timezone=auto"
+        )
+        r    = requests.get(url, timeout=5)
+        r.raise_for_status()
+        cur  = r.json().get('current', {})
+        code = cur.get('weather_code', 0)
+
+        desc_ar, desc_en, icon = 'صافٍ', 'Clear', '☀️'
+        if code in [1, 2, 3]:              desc_ar, desc_en, icon = 'غائم جزئياً',      'Partly Cloudy', '⛅'
+        elif code in [45, 48]:             desc_ar, desc_en, icon = 'ضباب',              'Fog',           '🌫️'
+        elif 51 <= code <= 67:             desc_ar, desc_en, icon = 'ممطر',              'Rain',          '🌧️'
+        elif 71 <= code <= 77:             desc_ar, desc_en, icon = 'ثلوج',              'Snow',          '❄️'
+        elif 80 <= code <= 82:             desc_ar, desc_en, icon = 'زخات مطر',          'Showers',       '🌦️'
+        elif code >= 95:                   desc_ar, desc_en, icon = 'عواصف رعدية',       'Thunderstorm',  '⛈️'
+
         return jsonify({
-            'status': 'success',
-            'temperature': temp,
-            'humidity': humidity,
-            'description_ar': desc_ar,
-            'description_en': desc_en,
-            'icon': icon
+            'status': 'success', 'source': 'Open-Meteo (fallback)',
+            'temperature': cur.get('temperature_2m', 0),
+            'humidity':    cur.get('relative_humidity_2m', 0),
+            'description_ar': desc_ar, 'description_en': desc_en, 'icon': icon
         })
-    except Exception as e:
-        return jsonify({'status': 'error', 'message': str(e)}), 500
+    except Exception as fallback_exc:
+        return jsonify({'status': 'error', 'message': str(fallback_exc)}), 500
 
 
 @app.route('/api/history', methods=['GET'])
