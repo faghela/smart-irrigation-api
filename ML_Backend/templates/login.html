@@ -427,24 +427,90 @@
             }
         }
 
-        /* Responsive */
+        /* ── Responsive (Tablets) ── */
+        @media (max-width: 768px) {
+            .glow-orb {
+                filter: blur(60px);
+                opacity: 0.5;
+            }
+
+            .orb-1 {
+                width: 200px;
+                height: 200px;
+            }
+
+            .orb-2 {
+                width: 250px;
+                height: 250px;
+            }
+        }
+
+        /* ── Responsive (Phones) ── */
         @media (max-width: 480px) {
             body {
-                padding: 1rem;
+                overflow-y: auto;
+                padding: 2rem 1rem;
+                min-height: 100vh;
+                min-height: 100dvh;
+            }
+
+            body::before {
+                display: none;
+            }
+
+            .glow-orb {
+                filter: blur(50px);
+                opacity: 0.35;
+            }
+
+            .orb-1 {
+                width: 150px;
+                height: 150px;
+                top: -40px;
+                left: 0;
+            }
+
+            .orb-2 {
+                width: 180px;
+                height: 180px;
+                bottom: -60px;
+                right: -20px;
             }
 
             .login-container {
-                padding: 2.5rem 1.5rem;
+                max-width: 100%;
                 width: 100%;
-                margin: 0 auto;
-            }
-
-            .title-ar {
-                font-size: 1.6rem;
+                padding: 2rem 1.5rem;
+                border-radius: 20px;
+                margin: auto;
             }
 
             .logo-icon {
-                font-size: 3rem;
+                font-size: 2.8rem;
+            }
+
+            .title-ar {
+                font-size: 1.5rem;
+            }
+
+            .title-en {
+                font-size: 0.65rem;
+                letter-spacing: 2px;
+            }
+
+            .cyber-input {
+                padding: 0.85rem 2.8rem 0.85rem 1rem;
+                font-size: 0.95rem;
+            }
+
+            .input-icon {
+                font-size: 1.1rem;
+                right: 14px;
+            }
+
+            .cyber-btn {
+                font-size: 1rem;
+                padding: 0.85rem;
             }
         }
     </style>
