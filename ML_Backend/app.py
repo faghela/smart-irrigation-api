@@ -34,7 +34,7 @@ DASHBOARD_USER_ID = os.environ.get('USER_ID', 'mohamed_f')
 DASHBOARD_TOKEN   = os.environ.get('USER_TOKEN',   '123456')
 
 # OpenWeatherMap API settings
-WEATHER_API_KEY = os.environ.get('WEATHER_API_KEY', '2f33589846c0be576378ba18eab4cbb5')
+WEATHER_API_KEY = os.environ.get('WEATHER_API_KEY', '6990e1c557eb3c3dd525cbb95de96965')
 CITY = os.environ.get('CITY', 'Tripoli')
 
 # ─────────────────────────────────────────────
