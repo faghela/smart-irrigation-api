@@ -15,7 +15,7 @@ DASHBOARD_TOKEN   = os.environ.get('USER_TOKEN', '123456')
 MONGO_URI = os.environ.get('MONGO_URI', 'mongodb://localhost:27017/')
 
 # ── OpenWeatherMap ────────────────────────────────
-WEATHER_API_KEY = os.environ.get('WEATHER_API_KEY', '6990e1c557eb3c3dd525cbb95de96965')
+WEATHER_API_KEY = os.environ.get('WEATHER_API_KEY', '2f33589846c0be576378ba18eab4cbb5')
 CITY = os.environ.get('CITY', 'Tripoli')
 
 # ── Server ────────────────────────────────────────
