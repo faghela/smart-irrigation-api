@@ -467,7 +467,7 @@
         {% endif %}
         {% endwith %}
 
-        <form method="POST" action="{{ url_for('login') }}" autocomplete="off">
+        <form method="POST" action="{{ url_for('auth.login') }}" autocomplete="off">
 
             <!-- User ID -->
             <label class="input-label" for="user_id">
